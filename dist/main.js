@@ -159,6 +159,11 @@ export default class ModuleInstance extends InstanceBase {
         this.log('debug', `Sending: ${command}`);
         await this.telnet.send(`${command}\r\n`);
     }
+    /**
+     * Query all variable-backed state from the device (power, input signal
+     * presence, and routing). Exposed as public so the refresh_all action
+     * callback and the polling timer can both call it.
+     */
     queryAllStatus() {
         // Use a small delay between queries to avoid flooding the device
         const queries = ['PWSTA', 'InputStatus', 'Status'];
