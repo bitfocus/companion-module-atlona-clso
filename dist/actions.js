@@ -19,13 +19,6 @@ export function UpdateActions(self) {
                 await self.sendCommand('PWSTA');
             },
         },
-        query_power_status: {
-            name: 'Power: Query Power Status',
-            options: [],
-            callback: async () => {
-                await self.sendCommand('PWSTA');
-            },
-        },
         // ── Routing ──────────────────────────────────────────────────────────────
         route_input_to_output: {
             name: 'Routing: Route Input to Output(s)',
@@ -286,47 +279,12 @@ export function UpdateActions(self) {
                 await self.sendCommand(`TrigCEC${output} ${state}`);
             },
         },
-        // ── Status Queries ───────────────────────────────────────────────────────
-        query_input_status: {
-            name: 'Status: Query Input Signal Status',
+        // ── Status ───────────────────────────────────────────────────────────────
+        refresh_all: {
+            name: 'Status: Refresh All Variables Now',
             options: [],
             callback: async () => {
-                await self.sendCommand('InputStatus');
-            },
-        },
-        query_routing_status: {
-            name: 'Status: Query Routing Status',
-            options: [],
-            callback: async () => {
-                await self.sendCommand('Status');
-            },
-        },
-        query_lock_status: {
-            name: 'Status: Query Front Panel Lock Status',
-            options: [],
-            callback: async () => {
-                await self.sendCommand('LockST');
-            },
-        },
-        query_network_config: {
-            name: 'Status: Query Network Configuration',
-            options: [],
-            callback: async () => {
-                await self.sendCommand('IPCFG');
-            },
-        },
-        query_firmware_version: {
-            name: 'Status: Query Firmware Version',
-            options: [],
-            callback: async () => {
-                await self.sendCommand('Version');
-            },
-        },
-        query_model_type: {
-            name: 'Status: Query Device Model',
-            options: [],
-            callback: async () => {
-                await self.sendCommand('Type');
+                self.queryAllStatus();
             },
         },
     };

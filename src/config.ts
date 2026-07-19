@@ -3,6 +3,7 @@ import { Regex, type SomeCompanionConfigField } from '@companion-module/base'
 export interface ModuleConfig {
 	host: string
 	port: number
+	poll_interval: number
 }
 
 export function GetConfigFields(): SomeCompanionConfigField[] {
@@ -30,6 +31,15 @@ export function GetConfigFields(): SomeCompanionConfigField[] {
 			min: 1,
 			max: 65535,
 			default: 23,
+		},
+		{
+			type: 'number',
+			id: 'poll_interval',
+			label: 'Poll Interval (seconds)',
+			width: 4,
+			min: 1,
+			max: 300,
+			default: 10,
 		},
 	]
 }

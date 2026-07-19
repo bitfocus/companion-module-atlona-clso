@@ -22,6 +22,7 @@ export default class ModuleInstance extends InstanceBase<ModuleConfig> {
 
 	private telnet: TelnetHelper | null = null
 	private receiveBuffer: string = ''
+	private pollTimer: ReturnType<typeof setInterval> | null = null
 
 	constructor(internal: unknown) {
 		super(internal)
@@ -42,6 +43,7 @@ export default class ModuleInstance extends InstanceBase<ModuleConfig> {
 	}
 
 	async destroy(): Promise<void> {
+		this.stopPolling()
 		if (this.telnet) {
 			this.telnet.destroy()
 			this.telnet = null
@@ -52,6 +54,7 @@ export default class ModuleInstance extends InstanceBase<ModuleConfig> {
 	async configUpdated(config: ModuleConfig): Promise<void> {
 		this.config = config
 
+		this.stopPolling()
 		if (this.telnet) {
 			this.telnet.destroy()
 			this.telnet = null
@@ -86,6 +89,7 @@ export default class ModuleInstance extends InstanceBase<ModuleConfig> {
 
 			// Query current state on connection
 			this.queryAllStatus()
+			this.startPolling()
 		})
 
 		this.telnet.on('data', (data: Buffer) => {
@@ -200,7 +204,7 @@ export default class ModuleInstance extends InstanceBase<ModuleConfig> {
 		await this.telnet.send(`${command}\r\n`)
 	}
 
-	private queryAllStatus(): void {
+	queryAllStatus(): void {
 		// Use a small delay between queries to avoid flooding the device
 		const queries = ['PWSTA', 'InputStatus', 'Status']
 		let delay = 0
@@ -211,6 +215,21 @@ export default class ModuleInstance extends InstanceBase<ModuleConfig> {
 				})
 			}, delay)
 			delay += 200
+		}
+	}
+
+	private startPolling(): void {
+		this.stopPolling()
+		const intervalMs = (this.config.poll_interval ?? 10) * 1000
+		this.pollTimer = setInterval(() => {
+			this.queryAllStatus()
+		}, intervalMs)
+	}
+
+	private stopPolling(): void {
+		if (this.pollTimer !== null) {
+			clearInterval(this.pollTimer)
+			this.pollTimer = null
 		}
 	}
 

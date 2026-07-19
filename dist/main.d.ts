@@ -7,6 +7,7 @@ export default class ModuleInstance extends InstanceBase<ModuleConfig> {
     outputRoutings: string[];
     private telnet;
     private receiveBuffer;
+    private pollTimer;
     constructor(internal: unknown);
     init(config: ModuleConfig): Promise<void>;
     destroy(): Promise<void>;
@@ -21,7 +22,9 @@ export default class ModuleInstance extends InstanceBase<ModuleConfig> {
      */
     private parseRoutingStatus;
     sendCommand(command: string): Promise<void>;
-    private queryAllStatus;
+    queryAllStatus(): void;
+    private startPolling;
+    private stopPolling;
     private initVariables;
     updateActions(): void;
     updateFeedbacks(): void;

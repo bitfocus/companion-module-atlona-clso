@@ -25,6 +25,15 @@ export function GetConfigFields() {
             max: 65535,
             default: 23,
         },
+        {
+            type: 'number',
+            id: 'poll_interval',
+            label: 'Poll Interval (seconds)',
+            width: 4,
+            min: 1,
+            max: 300,
+            default: 10,
+        },
     ];
 }
 //# sourceMappingURL=config.js.map

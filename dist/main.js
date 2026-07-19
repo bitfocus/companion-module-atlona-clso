@@ -14,6 +14,7 @@ export default class ModuleInstance extends InstanceBase {
         this.outputRoutings = new Array(NUM_OUTPUTS).fill('');
         this.telnet = null;
         this.receiveBuffer = '';
+        this.pollTimer = null;
     }
     async init(config) {
         this.config = config;
@@ -26,6 +27,7 @@ export default class ModuleInstance extends InstanceBase {
         this.connectTelnet();
     }
     async destroy() {
+        this.stopPolling();
         if (this.telnet) {
             this.telnet.destroy();
             this.telnet = null;
@@ -34,6 +36,7 @@ export default class ModuleInstance extends InstanceBase {
     }
     async configUpdated(config) {
         this.config = config;
+        this.stopPolling();
         if (this.telnet) {
             this.telnet.destroy();
             this.telnet = null;
@@ -60,6 +63,7 @@ export default class ModuleInstance extends InstanceBase {
             this.receiveBuffer = '';
             // Query current state on connection
             this.queryAllStatus();
+            this.startPolling();
         });
         this.telnet.on('data', (data) => {
             this.receiveBuffer += data.toString();
@@ -166,6 +170,19 @@ export default class ModuleInstance extends InstanceBase {
                 });
             }, delay);
             delay += 200;
+        }
+    }
+    startPolling() {
+        this.stopPolling();
+        const intervalMs = (this.config.poll_interval ?? 10) * 1000;
+        this.pollTimer = setInterval(() => {
+            this.queryAllStatus();
+        }, intervalMs);
+    }
+    stopPolling() {
+        if (this.pollTimer !== null) {
+            clearInterval(this.pollTimer);
+            this.pollTimer = null;
         }
     }
     // ── Internal helpers ──────────────────────────────────────────────────────

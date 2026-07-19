@@ -140,6 +140,26 @@ export function UpdatePresets(self: ModuleInstance): void {
 		}
 	}
 
+	// Refresh all variables
+	presets['refresh_all'] = {
+		type: 'button',
+		category: 'Status',
+		name: 'Refresh All Variables',
+		style: {
+			text: 'REFRESH',
+			size: '14',
+			color: combineRgb(255, 255, 255),
+			bgcolor: combineRgb(30, 30, 100),
+		},
+		feedbacks: [],
+		steps: [
+			{
+				down: [{ actionId: 'refresh_all', options: {} }],
+				up: [],
+			},
+		],
+	}
+
 	// Panel lock/unlock
 	presets['lock_panel'] = {
 		type: 'button',
