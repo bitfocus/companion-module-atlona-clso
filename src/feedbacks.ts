@@ -15,7 +15,7 @@ export function UpdateFeedbacks(self: ModuleInstance): void {
 			},
 			options: [],
 			callback: () => {
-				return self.powerStatus === 'PWON'
+				return self.powerOn
 			},
 		},
 
@@ -29,7 +29,7 @@ export function UpdateFeedbacks(self: ModuleInstance): void {
 			},
 			options: [],
 			callback: () => {
-				return self.powerStatus === 'PWOFF'
+				return !self.powerOn
 			},
 		},
 
@@ -53,7 +53,7 @@ export function UpdateFeedbacks(self: ModuleInstance): void {
 			],
 			callback: (feedback) => {
 				const input = feedback.options['input'] as number
-				return self.inputStatuses[input - 1] === '1'
+				return self.inputPresent[input - 1] ?? false
 			},
 		},
 
@@ -86,7 +86,7 @@ export function UpdateFeedbacks(self: ModuleInstance): void {
 			callback: (feedback) => {
 				const input = feedback.options['input'] as number
 				const output = feedback.options['output'] as number
-				return self.outputRoutings[output - 1] === String(input)
+				return self.outputRoutings[output - 1] === input
 			},
 		},
 	}

@@ -12,7 +12,7 @@ export function UpdateFeedbacks(self) {
             },
             options: [],
             callback: () => {
-                return self.powerStatus === 'PWON';
+                return self.powerOn;
             },
         },
         power_off: {
@@ -25,7 +25,7 @@ export function UpdateFeedbacks(self) {
             },
             options: [],
             callback: () => {
-                return self.powerStatus === 'PWOFF';
+                return !self.powerOn;
             },
         },
         input_signal: {
@@ -48,7 +48,7 @@ export function UpdateFeedbacks(self) {
             ],
             callback: (feedback) => {
                 const input = feedback.options['input'];
-                return self.inputStatuses[input - 1] === '1';
+                return self.inputPresent[input - 1] ?? false;
             },
         },
         output_routing: {
@@ -80,7 +80,7 @@ export function UpdateFeedbacks(self) {
             callback: (feedback) => {
                 const input = feedback.options['input'];
                 const output = feedback.options['output'];
-                return self.outputRoutings[output - 1] === String(input);
+                return self.outputRoutings[output - 1] === input;
             },
         },
     };

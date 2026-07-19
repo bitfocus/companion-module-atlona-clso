@@ -2,9 +2,9 @@ import { InstanceBase, type SomeCompanionConfigField } from '@companion-module/b
 import { type ModuleConfig } from './config.js';
 export default class ModuleInstance extends InstanceBase<ModuleConfig> {
     config: ModuleConfig;
-    powerStatus: string;
-    inputStatuses: string[];
-    outputRoutings: string[];
+    powerOn: boolean;
+    inputPresent: boolean[];
+    outputRoutings: number[];
     private telnet;
     private receiveBuffer;
     private pollTimer;

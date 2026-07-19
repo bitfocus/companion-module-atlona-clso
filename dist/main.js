@@ -9,9 +9,9 @@ export default class ModuleInstance extends InstanceBase {
     constructor(internal) {
         super(internal);
         // Internal state
-        this.powerStatus = '';
-        this.inputStatuses = new Array(NUM_INPUTS).fill('0');
-        this.outputRoutings = new Array(NUM_OUTPUTS).fill('');
+        this.powerOn = false;
+        this.inputPresent = new Array(NUM_INPUTS).fill(false);
+        this.outputRoutings = new Array(NUM_OUTPUTS).fill(0);
         this.telnet = null;
         this.receiveBuffer = '';
         this.pollTimer = null;
@@ -98,8 +98,8 @@ export default class ModuleInstance extends InstanceBase {
         this.log('debug', `Received: ${response}`);
         // Power status: "PWON" or "PWOFF"
         if (response === 'PWON' || response === 'PWOFF') {
-            this.powerStatus = response;
-            this.setVariableValues({ power_status: response });
+            this.powerOn = response === 'PWON';
+            this.setVariableValues({ power_on: this.powerOn });
             this.checkFeedbacks('power_on', 'power_off');
             return;
         }
@@ -108,11 +108,11 @@ export default class ModuleInstance extends InstanceBase {
         if (inputStatusMatch) {
             const statusStr = inputStatusMatch[1];
             for (let i = 0; i < NUM_INPUTS; i++) {
-                this.inputStatuses[i] = statusStr[i] ?? '0';
+                this.inputPresent[i] = statusStr[i] === '1';
             }
             const values = {};
             for (let i = 0; i < NUM_INPUTS; i++) {
-                values[`input_${i + 1}_status`] = this.inputStatuses[i] ?? '0';
+                values[`input_${i + 1}_present`] = this.inputPresent[i] ?? false;
             }
             this.setVariableValues(values);
             this.checkFeedbacks('input_signal');
@@ -131,7 +131,7 @@ export default class ModuleInstance extends InstanceBase {
      */
     parseRoutingStatus(status) {
         // Reset all outputs
-        this.outputRoutings = new Array(NUM_OUTPUTS).fill('');
+        this.outputRoutings = new Array(NUM_OUTPUTS).fill(0);
         const tokens = status.split(',');
         for (const token of tokens) {
             const match = token.trim().match(/^x(\d+)AVx(\d+)$/);
@@ -139,13 +139,13 @@ export default class ModuleInstance extends InstanceBase {
                 const input = parseInt(match[1], 10);
                 const output = parseInt(match[2], 10);
                 if (output >= 1 && output <= NUM_OUTPUTS) {
-                    this.outputRoutings[output - 1] = String(input);
+                    this.outputRoutings[output - 1] = input;
                 }
             }
         }
         const values = {};
         for (let i = 0; i < NUM_OUTPUTS; i++) {
-            values[`output_${i + 1}_routing`] = this.outputRoutings[i] ?? '';
+            values[`output_${i + 1}_routing`] = this.outputRoutings[i] ?? 0;
         }
         this.setVariableValues(values);
         this.checkFeedbacks('output_routing');
@@ -193,13 +193,13 @@ export default class ModuleInstance extends InstanceBase {
     // ── Internal helpers ──────────────────────────────────────────────────────
     initVariables() {
         const values = {
-            power_status: '',
+            power_on: false,
         };
         for (let i = 1; i <= NUM_INPUTS; i++) {
-            values[`input_${i}_status`] = '0';
+            values[`input_${i}_present`] = false;
         }
         for (let i = 1; i <= NUM_OUTPUTS; i++) {
-            values[`output_${i}_routing`] = '';
+            values[`output_${i}_routing`] = 0;
         }
         this.setVariableValues(values);
     }
