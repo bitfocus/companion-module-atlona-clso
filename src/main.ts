@@ -1,0 +1,251 @@
+import {
+	InstanceBase,
+	InstanceStatus,
+	runEntrypoint,
+	TelnetHelper,
+	type SomeCompanionConfigField,
+} from '@companion-module/base'
+import { GetConfigFields, type ModuleConfig } from './config.js'
+import { UpdateVariableDefinitions, NUM_INPUTS, NUM_OUTPUTS } from './variables.js'
+import { UpgradeScripts } from './upgrades.js'
+import { UpdateActions } from './actions.js'
+import { UpdateFeedbacks } from './feedbacks.js'
+import { UpdatePresets } from './presets.js'
+
+export default class ModuleInstance extends InstanceBase<ModuleConfig> {
+	config!: ModuleConfig
+
+	// Internal state
+	powerStatus: string = ''
+	inputStatuses: string[] = new Array(NUM_INPUTS).fill('0')
+	outputRoutings: string[] = new Array(NUM_OUTPUTS).fill('')
+
+	private telnet: TelnetHelper | null = null
+	private receiveBuffer: string = ''
+
+	constructor(internal: unknown) {
+		super(internal)
+	}
+
+	async init(config: ModuleConfig): Promise<void> {
+		this.config = config
+
+		this.updateStatus(InstanceStatus.Disconnected)
+
+		this.updateActions()
+		this.updateFeedbacks()
+		this.updatePresets()
+		this.updateVariableDefinitions()
+
+		this.initVariables()
+		this.connectTelnet()
+	}
+
+	async destroy(): Promise<void> {
+		if (this.telnet) {
+			this.telnet.destroy()
+			this.telnet = null
+		}
+		this.log('debug', 'destroy')
+	}
+
+	async configUpdated(config: ModuleConfig): Promise<void> {
+		this.config = config
+
+		if (this.telnet) {
+			this.telnet.destroy()
+			this.telnet = null
+		}
+
+		this.connectTelnet()
+	}
+
+	getConfigFields(): SomeCompanionConfigField[] {
+		return GetConfigFields()
+	}
+
+	// ── Telnet Connection ─────────────────────────────────────────────────────
+
+	private connectTelnet(): void {
+		if (!this.config.host) {
+			this.updateStatus(InstanceStatus.BadConfig, 'No IP address configured')
+			return
+		}
+
+		this.updateStatus(InstanceStatus.Connecting)
+
+		this.telnet = new TelnetHelper(this.config.host, this.config.port, {
+			reconnect: true,
+			reconnect_interval: 5000,
+		})
+
+		this.telnet.on('connect', () => {
+			this.log('debug', 'Telnet connected')
+			this.updateStatus(InstanceStatus.Ok)
+			this.receiveBuffer = ''
+
+			// Query current state on connection
+			this.queryAllStatus()
+		})
+
+		this.telnet.on('data', (data: Buffer) => {
+			this.receiveBuffer += data.toString()
+			this.processBuffer()
+		})
+
+		this.telnet.on('error', (err: Error) => {
+			this.log('error', `Telnet error: ${err.message}`)
+			this.updateStatus(InstanceStatus.ConnectionFailure, err.message)
+		})
+
+		this.telnet.on('end', () => {
+			this.log('debug', 'Telnet connection ended')
+			this.updateStatus(InstanceStatus.Disconnected)
+		})
+
+		this.telnet.on('status_change', (status, message) => {
+			this.updateStatus(status, message)
+		})
+
+		this.telnet.connect()
+	}
+
+	// ── Data Parsing ──────────────────────────────────────────────────────────
+
+	private processBuffer(): void {
+		const lines = this.receiveBuffer.split(/\r?\n/)
+
+		// Keep the last incomplete line in the buffer
+		this.receiveBuffer = lines.pop() ?? ''
+
+		for (const line of lines) {
+			const trimmed = line.trim()
+			if (trimmed) {
+				this.handleResponse(trimmed)
+			}
+		}
+	}
+
+	private handleResponse(response: string): void {
+		this.log('debug', `Received: ${response}`)
+
+		// Power status: "PWON" or "PWOFF"
+		if (response === 'PWON' || response === 'PWOFF') {
+			this.powerStatus = response
+			this.setVariableValues({ power_status: response })
+			this.checkFeedbacks('power_on', 'power_off')
+			return
+		}
+
+		// Input status: "InputStatus 00000000"
+		const inputStatusMatch = response.match(/^InputStatus\s+([01]{8})$/)
+		if (inputStatusMatch) {
+			const statusStr = inputStatusMatch[1]
+			for (let i = 0; i < NUM_INPUTS; i++) {
+				this.inputStatuses[i] = statusStr[i] ?? '0'
+			}
+			const values: Record<string, string> = {}
+			for (let i = 0; i < NUM_INPUTS; i++) {
+				values[`input_${i + 1}_status`] = this.inputStatuses[i] ?? '0'
+			}
+			this.setVariableValues(values)
+			this.checkFeedbacks('input_signal')
+			return
+		}
+
+		// Routing status: "x2AVx1,x2AVx2,x3AVx3,x4AVx4"
+		// Each token xNAVxM means input N is routed to output M
+		if (/^x\d+AVx\d/.test(response)) {
+			this.parseRoutingStatus(response)
+			return
+		}
+	}
+
+	/**
+	 * Parse routing status string like "x2AVx1,x2AVx2,x3AVx3,x4AVx4"
+	 * Sets outputRoutings[output-1] = inputNumber
+	 */
+	private parseRoutingStatus(status: string): void {
+		// Reset all outputs
+		this.outputRoutings = new Array(NUM_OUTPUTS).fill('')
+
+		const tokens = status.split(',')
+		for (const token of tokens) {
+			const match = token.trim().match(/^x(\d+)AVx(\d+)$/)
+			if (match) {
+				const input = parseInt(match[1], 10)
+				const output = parseInt(match[2], 10)
+				if (output >= 1 && output <= NUM_OUTPUTS) {
+					this.outputRoutings[output - 1] = String(input)
+				}
+			}
+		}
+
+		const values: Record<string, string> = {}
+		for (let i = 0; i < NUM_OUTPUTS; i++) {
+			values[`output_${i + 1}_routing`] = this.outputRoutings[i] ?? ''
+		}
+		this.setVariableValues(values)
+		this.checkFeedbacks('output_routing')
+	}
+
+	// ── Commands ──────────────────────────────────────────────────────────────
+
+	async sendCommand(command: string): Promise<void> {
+		if (!this.telnet || !this.telnet.isConnected) {
+			this.log('warn', `Cannot send command "${command}" — not connected`)
+			return
+		}
+		this.log('debug', `Sending: ${command}`)
+		await this.telnet.send(`${command}\r\n`)
+	}
+
+	private queryAllStatus(): void {
+		// Use a small delay between queries to avoid flooding the device
+		const queries = ['PWSTA', 'InputStatus', 'Status']
+		let delay = 0
+		for (const query of queries) {
+			setTimeout(() => {
+				this.sendCommand(query).catch((err: unknown) => {
+					this.log('error', `Failed to send query ${query}: ${String(err)}`)
+				})
+			}, delay)
+			delay += 200
+		}
+	}
+
+	// ── Internal helpers ──────────────────────────────────────────────────────
+
+	private initVariables(): void {
+		const values: Record<string, string> = {
+			power_status: '',
+		}
+		for (let i = 1; i <= NUM_INPUTS; i++) {
+			values[`input_${i}_status`] = '0'
+		}
+		for (let i = 1; i <= NUM_OUTPUTS; i++) {
+			values[`output_${i}_routing`] = ''
+		}
+		this.setVariableValues(values)
+	}
+
+	// ── Delegate update methods ───────────────────────────────────────────────
+
+	updateActions(): void {
+		UpdateActions(this)
+	}
+
+	updateFeedbacks(): void {
+		UpdateFeedbacks(this)
+	}
+
+	updatePresets(): void {
+		UpdatePresets(this)
+	}
+
+	updateVariableDefinitions(): void {
+		UpdateVariableDefinitions(this)
+	}
+}
+
+runEntrypoint(ModuleInstance, UpgradeScripts)

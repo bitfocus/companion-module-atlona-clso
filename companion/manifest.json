@@ -1,0 +1,26 @@
+{
+	"id": "atlona-clso",
+	"name": "Atlona AT-UHD-CLSO-840",
+	"shortname": "AT-UHD-CLSO-840",
+	"description": "Control module for the Atlona AT-UHD-CLSO-840 8x4 video matrix via Telnet",
+	"version": "1.0.0",
+	"license": "MIT",
+	"repository": "git+https://github.com/doxology-tech/companion-module-Atlona-CLSO.git",
+	"bugs": "https://github.com/doxology-tech/companion-module-Atlona-CLSO/issues",
+	"maintainers": [
+		{
+			"name": "Doxology Tech",
+			"github": "doxology-tech"
+		}
+	],
+	"legacyIds": [],
+	"runtime": {
+		"type": "node22",
+		"api": "nodejs-ipc",
+		"apiVersion": "0.0.0",
+		"entrypoint": "../dist/main.js"
+	},
+	"manufacturer": "Atlona",
+	"products": ["AT-UHD-CLSO-840"],
+	"keywords": ["video", "matrix", "hdmi", "routing", "atlona"]
+}
