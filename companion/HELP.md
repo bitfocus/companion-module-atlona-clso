@@ -2,20 +2,24 @@
 
 This module provides control of the Atlona AT-UHD-CLSO-840 8×4 HDBaseT/HDMI Video Matrix via its Telnet API.
 
+You will need the device's IP address (which you can view through the front panel menu) and you will need to ensure 
+that Telnet is enabled on the device without authentication.  Don't use this on a public or uncontrolled network.
+
 ## Configuration
 
-| Field | Description |
-|-------|-------------|
-| **Device IP Address** | IP address of the AT-UHD-CLSO-840 on your network |
-| **Telnet Port** | TCP port for Telnet (default: **23**) |
+| Field                 | Description                                                                |
+|-----------------------|----------------------------------------------------------------------------|
+| **Device IP Address** | IP address of the AT-UHD-CLSO-840 on your network                          |
+| **Telnet Port**       | TCP port for Telnet (default: **23**)                                      | 
+| **Polling Interval**  | How often to query the device for status updates (default: **10 seconds**) |
 
 ## Variables
 
-| Variable                                                            | Description |
-|---------------------------------------------------------------------|-------------|
-| `$(atlona-clso:power_status)`                                       | Current power state: `PWON` or `PWOFF` |
+| Variable                                                            | Description                                                         |
+|---------------------------------------------------------------------|---------------------------------------------------------------------|
+| `$(atlona-clso:power_status)`                                       | Current power state: `PWON` or `PWOFF`                              |
 | `$(atlona-clso:input_1_status)` – `$(atlona-clso:input_8_status)`   | Signal status for each input: `1` = signal present, `0` = no signal |
-| `$(atlona-clso:output_1_source)` – `$(atlona-clso:output_4_source)` | Input number currently routed to each output |
+| `$(atlona-clso:output_1_source)` – `$(atlona-clso:output_4_source)` | Input number currently routed to each output                        |
 
 ## Actions
 
@@ -43,27 +47,21 @@ This module provides control of the Atlona AT-UHD-CLSO-840 8×4 HDBaseT/HDMI Vid
 - **Enable/Disable Power Button Blink** — Sends `Blink on/off`
 
 ### CEC
-- **Trigger Stored CEC Command** — Sends `TrigCEC{output} on/off`
+- **Trigger On/Off CEC Command** — Sends `TrigCEC{output} on/off` to trigger a display to turn on or off via CEC.  Not all displays support this feature.
 
-### Status Queries
-- **Query Input Signal Status** — Sends `InputStatus`
-- **Query Routing Status** — Sends `Status`
-- **Query Front Panel Lock Status** — Sends `LockST`
-- **Query Network Configuration** — Sends `IPCFG`
-- **Query Firmware Version** — Sends `Version`
-- **Query Device Model** — Sends `Type`
+### Status
+- **Refresh All Variables Now** — Sends several commands to update the variables.  Useful if you want to use a longer polling interval and need to update the variables on demand. 
 
 ## Feedbacks
 
-| Feedback | Description |
-|----------|-------------|
-| **Power: Is Powered On** | True when matrix reports `PWON` |
-| **Power: Is In Standby** | True when matrix reports `PWOFF` |
-| **Input: Has Signal** | True when the selected input has an active signal |
+| Feedback                               | Description                                                   |
+|----------------------------------------|---------------------------------------------------------------|
+| **Power: Unit Is Powered On**          | True when matrix reports `PWON`                               |
+| **Power: Unit Is In Standby**          | True when matrix reports `PWOFF`                              |
+| **Input: Has Signal**                  | True when the selected input is receiving signal              |
 | **Routing: Output Is Routed to Input** | True when the selected output is routed to the selected input |
 
 ## Notes
 
-- All Telnet commands are case-sensitive
 - The module automatically queries power, input, and routing status upon connecting
 - The module will attempt to reconnect every 5 seconds if the connection is lost
