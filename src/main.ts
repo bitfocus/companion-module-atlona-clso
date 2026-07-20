@@ -190,7 +190,7 @@ export default class ModuleInstance extends InstanceBase<ModuleConfig> {
 			values[`output_${i + 1}_source`] = this.outputRoutings[i] ?? 0
 		}
 		this.setVariableValues(values)
-		this.checkFeedbacks('output_sources')
+		this.checkFeedbacks('output_source')
 	}
 
 	// ── Commands ──────────────────────────────────────────────────────────────

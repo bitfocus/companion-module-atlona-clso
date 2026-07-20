@@ -15,10 +15,10 @@ that Telnet is enabled on the device without authentication.  Don't use this on 
 
 ## Variables
 
-| Variable                                                            | Description                                                         |
-|---------------------------------------------------------------------|---------------------------------------------------------------------|
-| `$(atlona-clso:power_status)`                                       | Current power state: `PWON` or `PWOFF`                              |
-| `$(atlona-clso:input_1_status)` – `$(atlona-clso:input_8_status)`   | Signal status for each input: `1` = signal present, `0` = no signal |
+| Variable                                                                    | Description                                                              |
+|-----------------------------------------------------------------------------|--------------------------------------------------------------------------|
+| `$(atlona-clso:power_on)`                                                   | Current power state: `true` = powered on, `false` = standby             |
+| `$(atlona-clso:input_1_present)` – `$(atlona-clso:input_8_present)`         | Signal presence for each input: `true` = signal present, `false` = none |
 | `$(atlona-clso:output_1_source)` – `$(atlona-clso:output_4_source)` | Input number currently routed to each output                        |
 
 ## Actions
@@ -26,16 +26,15 @@ that Telnet is enabled on the device without authentication.  Don't use this on 
 ### Power
 - **Power On Matrix** — Sends `PWON`
 - **Place Matrix in Standby** — Sends `PWOFF`
-- **Query Power Status** — Sends `PWSTA`
 
 ### Routing
-- **Route Input to Output(s)** — Sends `x{input}AVx{output}`
+- **Route Input to Output** — Sends `x{input}AVx{output}`
 - **Route Input to All Outputs** — Sends `x{input}All`
 - **Reset to One-to-One Routing** — Sends `All#`
 - **Route Audio from Input to Output** — Sends `x{input}Ax{output}`
 
 ### Output Control
-- **Enable or Disable Output** — Sends `x{output}$`
+- **Toggle Output Channel** — Sends `x{output}$`
 - **Mute/Unmute Output Audio** — Sends `VOUTMute {output} on/off`
 - **Enable/Disable Audio Mirroring** — Sends `MirrorAudio {audioOut} {videoOut} on/off`
 - **Set Input Volume Level** — Sends `VIN {level}`
@@ -59,7 +58,7 @@ that Telnet is enabled on the device without authentication.  Don't use this on 
 | **Power: Unit Is Powered On**          | True when matrix reports `PWON`                               |
 | **Power: Unit Is In Standby**          | True when matrix reports `PWOFF`                              |
 | **Input: Has Signal**                  | True when the selected input is receiving signal              |
-| **Routing: Output Is Routed to Input** | True when the selected output is routed to the selected input |
+| **Routing: Input is Routed to Output** | True when the selected output is routed to the selected input |
 
 ## Notes
 
