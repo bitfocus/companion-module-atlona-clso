@@ -28,7 +28,7 @@ export function UpdateActions(self: ModuleInstance): void {
 		// ── Routing ──────────────────────────────────────────────────────────────
 
 		route_input_to_output: {
-			name: 'Routing: Route Input to Output(s)',
+			name: 'Routing: Route Input to Output',
 			options: [
 				{
 					id: 'input',
@@ -274,7 +274,7 @@ export function UpdateActions(self: ModuleInstance): void {
 		// ── CEC ──────────────────────────────────────────────────────────────────
 
 		trig_cec: {
-			name: 'CEC: Trigger Stored CEC Command',
+			name: 'CEC: Trigger On/Off CEC Command',
 			options: [
 				{
 					id: 'output',

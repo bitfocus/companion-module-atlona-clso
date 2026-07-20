@@ -187,10 +187,10 @@ export default class ModuleInstance extends InstanceBase<ModuleConfig> {
 
 		const values: Record<string, number> = {}
 		for (let i = 0; i < NUM_OUTPUTS; i++) {
-			values[`output_${i + 1}_routing`] = this.outputRoutings[i] ?? 0
+			values[`output_${i + 1}_source`] = this.outputRoutings[i] ?? 0
 		}
 		this.setVariableValues(values)
-		this.checkFeedbacks('output_routing')
+		this.checkFeedbacks('output_sources')
 	}
 
 	// ── Commands ──────────────────────────────────────────────────────────────
@@ -248,7 +248,7 @@ export default class ModuleInstance extends InstanceBase<ModuleConfig> {
 			values[`input_${i}_present`] = false
 		}
 		for (let i = 1; i <= NUM_OUTPUTS; i++) {
-			values[`output_${i}_routing`] = 0
+			values[`output_${i}_source`] = 0
 		}
 		this.setVariableValues(values)
 	}

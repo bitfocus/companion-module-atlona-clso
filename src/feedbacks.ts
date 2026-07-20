@@ -7,7 +7,7 @@ export function UpdateFeedbacks(self: ModuleInstance): void {
 	const feedbacks: CompanionFeedbackDefinitions = {
 		power_on: {
 			type: 'boolean',
-			name: 'Power: Is Powered On',
+			name: 'Power: Unit Is Powered On',
 			description: 'Change button style when the matrix is powered on',
 			defaultStyle: {
 				bgcolor: combineRgb(0, 204, 0),
@@ -21,7 +21,7 @@ export function UpdateFeedbacks(self: ModuleInstance): void {
 
 		power_off: {
 			type: 'boolean',
-			name: 'Power: Is In Standby',
+			name: 'Power: Unit Is In Standby',
 			description: 'Change button style when the matrix is in standby mode',
 			defaultStyle: {
 				bgcolor: combineRgb(204, 0, 0),
@@ -35,7 +35,7 @@ export function UpdateFeedbacks(self: ModuleInstance): void {
 
 		input_signal: {
 			type: 'boolean',
-			name: 'Input: Has Signal',
+			name: 'Input: Input Has Signal',
 			description: 'Change button style when an input has an active signal',
 			defaultStyle: {
 				bgcolor: combineRgb(0, 153, 255),
@@ -57,10 +57,10 @@ export function UpdateFeedbacks(self: ModuleInstance): void {
 			},
 		},
 
-		output_routing: {
+		output_source: {
 			type: 'boolean',
-			name: 'Routing: Output Is Routed to Input',
-			description: 'Change button style when an output is routed to a specific input',
+			name: 'Routing: Input is Routed to Output',
+			description: 'Change button style when an input is routed to a specific output',
 			defaultStyle: {
 				bgcolor: combineRgb(255, 153, 0),
 				color: combineRgb(255, 255, 255),

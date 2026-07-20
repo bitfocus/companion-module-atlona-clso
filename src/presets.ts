@@ -99,7 +99,7 @@ export function UpdatePresets(self: ModuleInstance): void {
 				},
 				feedbacks: [
 					{
-						feedbackId: 'output_routing',
+						feedbackId: 'output_source',
 						options: { input: input, output: output },
 						style: {
 							bgcolor: combineRgb(255, 153, 0),

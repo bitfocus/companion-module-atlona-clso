@@ -21,7 +21,7 @@ export function UpdateVariableDefinitions(self: ModuleInstance): void {
 
 	for (let i = 1; i <= NUM_OUTPUTS; i++) {
 		variables.push({
-			variableId: `output_${i}_routing`,
+			variableId: `output_${i}_source`,
 			name: `Output ${i} Routed Input Number (0 = unknown)`,
 		})
 	}

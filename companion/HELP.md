@@ -11,11 +11,11 @@ This module provides control of the Atlona AT-UHD-CLSO-840 8×4 HDBaseT/HDMI Vid
 
 ## Variables
 
-| Variable | Description |
-|----------|-------------|
-| `$(atlona-clso:power_status)` | Current power state: `PWON` or `PWOFF` |
-| `$(atlona-clso:input_1_status)` – `$(atlona-clso:input_8_status)` | Signal status for each input: `1` = signal present, `0` = no signal |
-| `$(atlona-clso:output_1_routing)` – `$(atlona-clso:output_4_routing)` | Input number currently routed to each output |
+| Variable                                                            | Description |
+|---------------------------------------------------------------------|-------------|
+| `$(atlona-clso:power_status)`                                       | Current power state: `PWON` or `PWOFF` |
+| `$(atlona-clso:input_1_status)` – `$(atlona-clso:input_8_status)`   | Signal status for each input: `1` = signal present, `0` = no signal |
+| `$(atlona-clso:output_1_source)` – `$(atlona-clso:output_4_source)` | Input number currently routed to each output |
 
 ## Actions
 

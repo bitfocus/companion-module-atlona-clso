@@ -12,7 +12,7 @@ export function GetConfigFields(): SomeCompanionConfigField[] {
 			type: 'static-text',
 			id: 'info',
 			label: 'Information',
-			value: 'Connect to the Atlona AT-UHD-CLSO-840 via Telnet. Default port is 23.',
+			value: 'Connect to the Atlona AT-UHD-CLSO-840 via the Telnet API. You will need the IP address of the matrix, and will need to have Telnet enabled without authentication.  Do not use outside of a controlled network environment.',
 			width: 12,
 		},
 		{
