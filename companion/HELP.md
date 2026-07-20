@@ -15,11 +15,11 @@ that Telnet is enabled on the device without authentication.  Don't use this on 
 
 ## Variables
 
-| Variable                                                                    | Description                                                              |
-|-----------------------------------------------------------------------------|--------------------------------------------------------------------------|
-| `$(atlona-clso:power_on)`                                                   | Current power state: `true` = powered on, `false` = standby             |
-| `$(atlona-clso:input_1_present)` – `$(atlona-clso:input_8_present)`         | Signal presence for each input: `true` = signal present, `false` = none |
-| `$(atlona-clso:output_1_source)` – `$(atlona-clso:output_4_source)` | Input number currently routed to each output                        |
+| Variable                                                            | Description                                                             |
+|---------------------------------------------------------------------|-------------------------------------------------------------------------|
+| `$(atlona-clso:power_on)`                                           | Current power state: `true` = powered on, `false` = standby             |
+| `$(atlona-clso:input_1_present)` – `$(atlona-clso:input_8_present)` | Signal presence for each input: `true` = signal present, `false` = none |
+| `$(atlona-clso:output_1_source)` – `$(atlona-clso:output_4_source)` | Input number currently routed to each output                            |
 
 ## Actions
 
