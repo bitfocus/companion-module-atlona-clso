@@ -1,0 +1,28 @@
+{
+	"name": "companion-module-atlona-clso",
+	"version": "1.0.0",
+	"description": "Companion module for the Atlona AT-UHD-CLSO-840 video matrix",
+	"main": "dist/main.js",
+	"type": "module",
+	"scripts": {
+		"build": "tsc -p tsconfig.json && companion-module-build",
+		"dev": "tsc -p tsconfig.json --watch",
+		"lint": "eslint src"
+	},
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/doxology-tech/companion-module-Atlona-CLSO.git"
+	},
+	"engines": {
+		"node": ">=18"
+	},
+	"dependencies": {
+		"@companion-module/base": "1.14.0"
+	},
+	"devDependencies": {
+		"@companion-module/tools": "2.7.2",
+		"@types/node": "^20.0.0",
+		"typescript": "~5.4.0"
+	}
+}
