@@ -1,5 +1,6 @@
 {
 	"name": "companion-module-atlona-clso",
+	"version": "1.0.4",
 	"description": "Companion module for the Atlona AT-UHD-CLSO-840 video matrix",
 	"main": "dist/main.js",
 	"type": "module",
