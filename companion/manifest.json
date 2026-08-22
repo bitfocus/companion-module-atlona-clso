@@ -3,10 +3,10 @@
 	"name": "Atlona AT-UHD-CLSO-840",
 	"shortname": "AT-UHD-CLSO-840",
 	"description": "Control module for the Atlona AT-UHD-CLSO-840 8x4 video matrix via Telnet",
-	"version": "1.0.0",
+	"version": "0.0.0",
 	"license": "MIT",
-	"repository": "git+https://github.com/doxology-tech/companion-module-Atlona-CLSO.git",
-	"bugs": "https://github.com/doxology-tech/companion-module-Atlona-CLSO/issues",
+	"repository": "git+https://github.com/bitfocus/companion-module-atlona-clso.git",
+	"bugs": "https://github.com/bitfocus/companion-module-atlona-clso/issues",
 	"maintainers": [
 		{
 			"name": "Doxology Tech",
